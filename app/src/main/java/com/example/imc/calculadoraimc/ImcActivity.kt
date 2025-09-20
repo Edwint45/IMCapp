@@ -1,6 +1,7 @@
 package com.example.imc.calculadoraimc
 
 import android.os.Bundle
+import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.cardview.widget.CardView
@@ -8,6 +9,8 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.example.imc.R
+import com.google.android.material.floatingactionbutton.FloatingActionButton
+import com.google.android.material.slider.RangeSlider
 
 /**
  * Actividad principal para la calculadora de Índice de Masa Corporal (IMC).
@@ -23,10 +26,18 @@ class ImcActivity : AppCompatActivity() {
     // `isFemaleSelected` es true si el género femenino está seleccionado.
     private var isFemaleSelected:Boolean = false
 
+    private var currentWeight: Int = 60
+
     // Referencias a las vistas CardView para la selección de género.
     private lateinit var viewMale:CardView
     private lateinit var viewFemale:CardView
 
+    private lateinit var tvHeight:TextView
+    private lateinit var rsHeight: RangeSlider
+
+    private lateinit var btnSubtractWeight: FloatingActionButton
+    private lateinit var btnPlusWeight :FloatingActionButton
+    private lateinit var tvWeight: TextView
     /**
      * Se llama cuando la actividad es creada por primera vez.
      * Este es el lugar donde se debe realizar la mayor parte de la inicialización:
@@ -63,6 +74,13 @@ class ImcActivity : AppCompatActivity() {
     private fun initComponents() {
         viewMale = findViewById(R.id.viewMale)
         viewFemale = findViewById(R.id.viewFemale)
+
+        tvHeight = findViewById(R.id.tvHeight)
+        rsHeight = findViewById(R.id.rsHeight)
+
+        btnSubtractWeight = findViewById(R.id.btnSubtractWeight)
+        btnPlusWeight = findViewById(R.id.btnPlusWeight)
+        tvWeight = findViewById(R.id.tvWeight)
     }
 
     /**
@@ -82,6 +100,28 @@ class ImcActivity : AppCompatActivity() {
             changeGender()
             setGenderColor()
         }
+
+        rsHeight.addOnChangeListener { _, value, _ ->
+            val df = java.text.DecimalFormat("#.##")
+            val result = df.format(value)
+            tvHeight.text = "$result cm"
+        }
+
+        btnPlusWeight.setOnClickListener {
+            currentWeight += 1
+            setWeight()
+        }
+
+        btnSubtractWeight.setOnClickListener {
+            currentWeight -= 1
+            setWeight()
+        }
+
+
+    }
+
+    private fun setWeight() {
+        tvWeight.text = currentWeight.toString()
     }
 
     /**
@@ -144,7 +184,7 @@ class ImcActivity : AppCompatActivity() {
      */
     private fun initUI() {
         setGenderColor()
-
+        setWeight()
     }
 
 }
