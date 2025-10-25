@@ -13,6 +13,9 @@
         android:theme="@style/Theme.IMC"
         tools:targetApi="31">
         <activity
+            android:name=".calculadoraimc.ResultIMCActivity"
+            android:exported="false" />
+        <activity
             android:name=".calculadoraimc.ImcActivity"
             android:exported="false" />
         <activity

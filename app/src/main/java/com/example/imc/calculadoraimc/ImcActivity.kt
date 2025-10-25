@@ -1,6 +1,9 @@
 package com.example.imc.calculadoraimc
 
+import android.content.Intent
 import android.os.Bundle
+import android.util.Log
+import android.widget.Button
 import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
@@ -11,6 +14,7 @@ import androidx.core.view.WindowInsetsCompat
 import com.example.imc.R
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.slider.RangeSlider
+import java.text.DecimalFormat
 
 /**
  * Actividad principal para la calculadora de Índice de Masa Corporal (IMC).
@@ -28,6 +32,10 @@ class ImcActivity : AppCompatActivity() {
 
     private var currentWeight: Int = 60
 
+    private var currentAge: Int = 20
+
+    private var currentHeight:Int = 120
+
     // Referencias a las vistas CardView para la selección de género.
     private lateinit var viewMale:CardView
     private lateinit var viewFemale:CardView
@@ -38,6 +46,18 @@ class ImcActivity : AppCompatActivity() {
     private lateinit var btnSubtractWeight: FloatingActionButton
     private lateinit var btnPlusWeight :FloatingActionButton
     private lateinit var tvWeight: TextView
+
+
+    private lateinit var btnSubtractAge: FloatingActionButton
+    private lateinit var btnPlusAge :FloatingActionButton
+    private lateinit var tvAge: TextView
+
+    private lateinit var btnCalculate: Button
+
+
+    companion object{
+        const val IMC_KEY = "IMC_RESULT"
+    }
     /**
      * Se llama cuando la actividad es creada por primera vez.
      * Este es el lugar donde se debe realizar la mayor parte de la inicialización:
@@ -81,6 +101,12 @@ class ImcActivity : AppCompatActivity() {
         btnSubtractWeight = findViewById(R.id.btnSubtractWeight)
         btnPlusWeight = findViewById(R.id.btnPlusWeight)
         tvWeight = findViewById(R.id.tvWeight)
+
+        btnSubtractAge = findViewById(R.id.btnSubtractAge)
+        btnPlusAge = findViewById(R.id.btnPlusAge)
+        tvAge = findViewById(R.id.tvAge)
+
+        btnCalculate = findViewById(R.id.btnCalculate)
     }
 
     /**
@@ -102,9 +128,9 @@ class ImcActivity : AppCompatActivity() {
         }
 
         rsHeight.addOnChangeListener { _, value, _ ->
-            val df = java.text.DecimalFormat("#.##")
-            val result = df.format(value)
-            tvHeight.text = "$result cm"
+            val df = DecimalFormat("#.##")
+            currentHeight = df.format(value).toInt()
+            tvHeight.text = "$currentHeight cm"
         }
 
         btnPlusWeight.setOnClickListener {
@@ -117,7 +143,33 @@ class ImcActivity : AppCompatActivity() {
             setWeight()
         }
 
+        btnPlusAge.setOnClickListener {
+            currentAge += 1
+            setAge()
+        }
 
+        btnSubtractAge.setOnClickListener {
+            currentAge -= 1
+            setAge()
+        }
+
+
+        btnCalculate.setOnClickListener{
+            val result =calculateIMC()
+            navigateToResult(result)
+        }
+    }
+
+    private fun navigateToResult(result: Double) {
+        val intent = Intent(this, ResultIMCActivity::class.java)
+        intent.putExtra(IMC_KEY, result)
+        startActivity(intent)
+    }
+
+    private fun calculateIMC():Double {
+        val df = DecimalFormat("#.##")
+        val imc = currentWeight / (currentHeight.toDouble() /100 * currentHeight.toDouble()/100)
+        return df.format(imc).toDouble()
     }
 
     private fun setWeight() {
@@ -185,6 +237,11 @@ class ImcActivity : AppCompatActivity() {
     private fun initUI() {
         setGenderColor()
         setWeight()
+        setAge()
+    }
+
+    private fun setAge(){
+        tvAge.text = currentAge.toString()
     }
 
 }
