@@ -37,25 +37,45 @@ class ImcActivity : AppCompatActivity() {
     private var currentHeight:Int = 120
 
     // Referencias a las vistas CardView para la selección de género.
+    /** Referencia al CardView para seleccionar el género masculino. */
     private lateinit var viewMale:CardView
+    /** Referencia al CardView para seleccionar el género femenino. */
     private lateinit var viewFemale:CardView
 
+    /** Referencia al TextView que muestra el valor actual de la altura. */
     private lateinit var tvHeight:TextView
+    /** Referencia al RangeSlider que permite al usuario ajustar la altura. */
     private lateinit var rsHeight: RangeSlider
 
+    /** Referencia al botón flotante para disminuir el valor del peso. */
     private lateinit var btnSubtractWeight: FloatingActionButton
+    /** Referencia al botón flotante para aumentar el valor del peso. */
     private lateinit var btnPlusWeight :FloatingActionButton
+    /** Referencia al TextView que muestra el valor actual del peso. */
     private lateinit var tvWeight: TextView
 
-
+    /** Referencia al botón flotante para disminuir el valor de la edad. */
     private lateinit var btnSubtractAge: FloatingActionButton
+    /** Referencia al botón flotante para aumentar el valor de la edad. */
     private lateinit var btnPlusAge :FloatingActionButton
+    /** Referencia al TextView que muestra el valor actual de la edad. */
     private lateinit var tvAge: TextView
-
+    /** Referencia al botón que inicia el cálculo del IMC. */
     private lateinit var btnCalculate: Button
 
-
+    // --- Constantes ---
+    /**
+     * Un `companion object` es similar a los miembros estáticos en otros lenguajes.
+     * Los valores definidos aquí pertenecen a la clase `ImcActivity` en sí, no a una
+     * instancia específica de ella.
+     */
     companion object{
+        /**
+         * Clave constante que se utiliza para pasar el resultado del IMC
+         * entre `ImcActivity` y `ResultIMCActivity` a través de un Intent.
+         * Usar una constante evita errores tipográficos al escribir la clave
+         * como un simple String.
+         */
         const val IMC_KEY = "IMC_RESULT"
     }
     /**
@@ -160,15 +180,59 @@ class ImcActivity : AppCompatActivity() {
         }
     }
 
+    /**
+     * Navega a la actividad `ResultIMCActivity` para mostrar el resultado del cálculo.
+     *
+     * Este método crea un `Intent` para iniciar la nueva actividad, adjunta el resultado
+     * del IMC como un dato "extra" para que la actividad de destino pueda leerlo,
+     * y finalmente inicia la transición a `ResultIMCActivity`.
+     *
+     * @param result El valor del IMC calculado (Double), que se pasará a la siguiente actividad.
+     */
     private fun navigateToResult(result: Double) {
+        // 1. Crear un Intent: Un 'Intent' es un objeto de mensajería que se puede usar
+        //    para solicitar una acción de otro componente de la aplicación.
+        //    Aquí, especifica que queremos pasar de la actividad actual (`this`)
+        //    a la actividad `ResultIMCActivity`.
         val intent = Intent(this, ResultIMCActivity::class.java)
+        // 2. Añadir datos extra al Intent: `putExtra` permite adjuntar datos adicionales
+        //    al intent. Estamos "empaquetando" el resultado del IMC.
+        //    - `IMC_KEY`: Es una clave constante (String) que actúa como un identificador único
+        //      para este dato. La actividad receptora usará esta misma clave para recuperar el valor.
+        //    - `result`: Es el valor del IMC que queremos enviar.
         intent.putExtra(IMC_KEY, result)
+        // 3. Iniciar la nueva actividad: `startActivity` le dice al sistema Android que
+        //    inicie la actividad especificada en el intent, realizando la transición
+        //    de pantalla.
         startActivity(intent)
     }
 
+    /**
+     * Calcula el Índice de Masa Corporal (IMC) utilizando los valores actuales de peso y altura.
+     *
+     * La fórmula del IMC es: peso (kg) / [altura (m)]^2.
+     * Esta función toma el peso actual (`currentWeight`) y la altura (`currentHeight`),
+     * convierte la altura de centímetros a metros, aplica la fórmula y finalmente
+     * formatea el resultado para que tenga un máximo de dos decimales.
+     *
+     * @return El valor del IMC calculado como un `Double` con dos decimales.
+     */
     private fun calculateIMC():Double {
+        // 1. Crear un formateador de decimales: DecimalFormat("#.##") se usa para
+        //    asegurar que el resultado final no tenga más de dos decimales.
         val df = DecimalFormat("#.##")
+        // 2. Calcular el IMC:
+        //    - currentHeight.toDouble() / 100: Se convierte la altura (que está en cm) a Double
+        //      y se divide por 100 para obtener la altura en metros.
+        //    - ... * ...: Se multiplica por sí mismo para obtener la altura al cuadrado (altura^2).
+        //    - currentWeight / ...: Se divide el peso (en kg) por la altura al cuadrado (en m^2).
         val imc = currentWeight / (currentHeight.toDouble() /100 * currentHeight.toDouble()/100)
+        // 3. Formatear y devolver el resultado:
+        //    - df.format(imc): Aplica el formato al resultado del IMC, devolviendo un String
+        //      (ej: "24.56" o "21.3").
+        //    - .toDouble(): Convierte ese String formateado de nuevo a un tipo `Double`
+        //      para que pueda ser devuelto por la función y usado en cálculos posteriores
+        //      o pasado a la siguiente actividad.
         return df.format(imc).toDouble()
     }
 
@@ -239,6 +303,15 @@ class ImcActivity : AppCompatActivity() {
         setWeight()
         setAge()
     }
+
+    /**
+     * Actualiza el TextView que muestra la edad en la interfaz de usuario.
+     *
+     * Esta función toma el valor actual de la variable `currentAge` (un entero),
+     * lo convierte a un String y lo asigna como el texto del `TextView` `tvAge`.
+     * Se llama cada vez que el valor de la edad cambia para que el usuario vea
+     * la actualización en pantalla.
+     */
 
     private fun setAge(){
         tvAge.text = currentAge.toString()
